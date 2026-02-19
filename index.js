@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const http = require("http");
 const express = require("express");
 const app = express();
@@ -23,16 +25,18 @@ const {
 
 const Canvas = require("canvas");
 
-const {
-  TOKEN,
-  WelcomeChannel,
-  WelcomeMessage,
-  AutoRole,
-  AutoRoleName,
-  SetStatus,
-  DM,
-  DMMessage
-} = require("./config.json");
+/* ===== ENV VARIABLES ===== */
+
+const TOKEN = process.env.TOKEN;
+const WelcomeChannel = process.env.WELCOME_CHANNEL;
+const WelcomeMessage = process.env.WELCOME_MESSAGE;
+const AutoRole = process.env.AUTO_ROLE === "true";
+const AutoRoleName = process.env.AUTO_ROLE_NAME;
+const SetStatus = process.env.SET_STATUS;
+const DM = process.env.DM === "true";
+const DMMessage = process.env.DM_MESSAGE;
+
+/* ============================= */
 
 const client = new Client({
   intents: [
@@ -49,7 +53,7 @@ client.once("ready", () => {
   console.log(`✅ Logged in as ${client.user.tag}`);
 
   client.user.setPresence({
-    activities: [{ name: SetStatus, type: ActivityType.Playing }],
+    activities: [{ name: SetStatus || "Welcome Bot", type: ActivityType.Playing }],
     status: "online"
   });
 });
@@ -99,7 +103,7 @@ client.on("guildMemberAdd", async (member) => {
     ctx.drawImage(avatar, 36, 21, 260, 260);
 
     const welcomeMsg = WelcomeMessage
-      .replace("[[user]]", `<@${member.id}>`)
+      ?.replace("[[user]]", `<@${member.id}>`)
       .replace("[[server]]", member.guild.name)
       .replace("[[members]]", member.guild.memberCount);
 
@@ -110,18 +114,16 @@ client.on("guildMemberAdd", async (member) => {
 
     setTimeout(() => {
       channel.send({
-        content: welcomeMsg,
+        content: welcomeMsg || `Welcome <@${member.id}>!`,
         files: [attachment]
       });
     }, 2000);
 
-    /* Auto Role */
-    if (AutoRole === true && role) {
+    if (AutoRole && role) {
       await member.roles.add(role);
     }
 
-    /* DM Message */
-    if (DM === true && DMMessage) {
+    if (DM && DMMessage) {
       await member.send(DMMessage);
     }
 
