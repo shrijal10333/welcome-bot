@@ -1,0 +1,9 @@
+{
+  "WelcomeChannel": "welcome",
+  "WelcomeMessage": "Hey [[user]], Welcome to [[server]] you are member number: [[members]]",
+  "AutoRole": true,
+  "AutoRoleName": "Community",
+  "SetStatus": "Online",
+  "DM": true,
+  "DMMessage": "Hey [[user]], Welcome you are member number: [[members]]"
+}
